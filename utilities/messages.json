@@ -1,0 +1,4 @@
+{
+    "join_message": "[+] %member%",
+    "leave_message": "[-] %member%"
+}
