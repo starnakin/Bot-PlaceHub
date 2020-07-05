@@ -10,8 +10,7 @@ colore = ["blue"]
 async def on_ready():
     print(f'Logged in as: {bot.user.name}')
     print(f'With ID: {bot.user.id}')
-    activity = discord.Activity(name=JsonManager.getActivity(), type=discord.ActivityType.watching)
-    await bot.change_presence(activity=activity)
+    await bot.change_presence(activity=discord.Activity(name=JsonManager.getActivity(), type=discord.ActivityType.watching))
 
 @bot.command()
 async def embed(ctx, *args):
@@ -32,7 +31,7 @@ async def embed(ctx, *args):
 async def on_member_join(member):
     channel = bot.get_channel(JsonManager.getChannel("welcome"))
     await channel.send(str(JsonManager.getMessage("join_message")).replace("%member%", member.name)) 
-    await member.add_roles(discord.utils.get((member.guild.id).roles, name=JsonManager.getRole("member")))
+    await member.add_roles(discord.utils.get(member.guild.roles, name=JsonManager.getRole("new")))
 
 @bot.event
 async def on_member_remove(member):
@@ -42,10 +41,12 @@ async def on_member_remove(member):
 
 @bot.event
 async def on_raw_reaction_add(payload):
+    member = bot.get_guild(payload.guild_id).get_member(payload.user_id)
     if payload.channel_id == JsonManager.getChannel("rule"):
-        if payload.emoji.name == ":white_check_mark:":
-            await payload.user.add_roles(discord.utils.get(payload.guild.id(payload.guild_id).roles, name=JsonManager.getRole("member")))
-        if payload.emoji.name == ":x:":
-            await payload.user.kick()
+        print(payload.emoji.name)
+        if payload.emoji.name == "✅":
+            await member.add_roles(discord.utils.get(bot.get_guild(payload.guild_id).roles, name=JsonManager.getRole("member")))
+        if payload.emoji.name == "❌":
+            await member.kick()
 
 bot.run(JsonManager.getToken())
